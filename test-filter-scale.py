@@ -221,6 +221,7 @@ model_CNN.summary()
 
 # %%
 import utils.objectives
+import utils.metrics
 
 def setup_experiment(config_vars, experiment_name):
     # Output dirs
@@ -234,19 +235,27 @@ def setup_experiment(config_vars, experiment_name):
 
 config_vars = {}
 config_vars['epochs'] = 50
-config_vars['learning_rate'] = 1e-4
-config_vars['root_directory'] = '/home/panwh/space-hhblits'
+config_vars['batch_size'] = 4
+config_vars['learning_rate'] = 1e-3
+config_vars['root_directory'] = '/home/panwh/space-hhblits/'
 
 
 setup_experiment(config_vars, 'test')
 
+
 optimizer = tf.keras.optimizers.RMSprop(lr = config_vars['learning_rate'])
-loss = utils.objectives.masked_crossentropy
-metrics = [utils.metrics.six_metrics]
+loss = utils.objectives.weighted_masked_crossentropy(weight=500)
+metrics = [utils.metrics.sensitivities_metric(func_name = 'sensitivities'),
+           utils.metrics.specificities_metric(func_name = 'specificities'),
+           utils.metrics.precision_metric(func_name = 'precision'),
+           utils.metrics.accuracy_metric(func_name = 'accuracy'),
+           utils.metrics.f1_score_metric(func_name = 'f1_score'),
+           utils.metrics.mcc_metric(func_name = 'mcc')]
 model_CNN.compile(loss=loss, metrics = metrics, optimizer=optimizer)
 
-checkpoint = keras.callbacks.ModelCheckpoint(config_vars["experiment_dir"] + '/weights-{epoch:02d}.h5', monitor='val_loss', mode='min', #val_categorical_accuracy val_acc
-                                              save_best_only=True, save_weights_only=True, verbose=1) 
+# model_CNN.compile(loss=loss, optimizer=optimizer)
+checkpoint = keras.callbacks.ModelCheckpoint(config_vars["experiment_dir"] + '/weights-{epoch:02d}.h5', monitor='mcc', mode='max', #val_categorical_accuracy val_acc
+                                            save_best_only=True, save_weights_only=True, verbose=1) 
 # Performance logging
 callback_csv = keras.callbacks.CSVLogger(filename=config_vars["csv_log_file"])
 
@@ -254,7 +263,8 @@ callbacks=[checkpoint,callback_csv]
 model_CNN.fit(
     x = train_set[:,:,0:50],
     y = train_set[:,:,51:None],
-    validation_data = tf.concat([valid_set[:,:,0:50],valid_set[:,:,51:None]],-1),
+    batch_size = config_vars['batch_size'],
+    validation_data = (valid_set[:,:,0:50],valid_set[:,:,51:None]),
     epochs = config_vars['epochs'],
     callbacks=callbacks,
     verbose = 1
