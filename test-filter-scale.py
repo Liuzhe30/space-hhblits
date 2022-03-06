@@ -34,7 +34,7 @@ with open("data/dataset_alphafold.txt") as file:
             uniprot_id = line[1:].strip()
             seq = file.readline().strip()
             label = file.readline().strip()
-             seq_len = len(seq)
+            seq_len = len(seq)
             feature_matrix = np.zeros([seq_len + 2 * t, 52], float) # 20+30+1+1,onehot+spacehhblits+noseq+mask
             shhm_matrix = np.loadtxt(shhm_path + uniprot_id + ".shhm")
             # check padding
