@@ -3,12 +3,19 @@ import tensorflow as tf
 
 def sensitivities_metric(func_name = 'sensitivities'):
     def sensitivities_func(y_true, y_pred):
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
@@ -23,12 +30,18 @@ def sensitivities_metric(func_name = 'sensitivities'):
 
 def specificities_metric(func_name = 'specificities'):
     def specificities_func(y_true, y_pred):
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
@@ -43,12 +56,18 @@ def specificities_metric(func_name = 'specificities'):
 
 def precision_metric(func_name = 'specificities'):
     def precision_func(y_true, y_pred):
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
@@ -63,12 +82,18 @@ def precision_metric(func_name = 'specificities'):
 
 def accuracy_metric(func_name = 'accuracy'):
     def accuracy_func(y_true, y_pred):
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
@@ -83,12 +108,18 @@ def accuracy_metric(func_name = 'accuracy'):
 
 def f1_score_metric(func_name = 'f1_score'):
     def f1_score_func(y_true, y_pred):
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
@@ -112,13 +143,18 @@ def f1_score_metric(func_name = 'f1_score'):
 
 def mcc_metric(func_name = 'mcc'):
     def mcc_func(y_true, y_pred):
-        threshold = 100
-        y_pred_false = tf.math.less_equal(y_pred, 0)
-        y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
-        y_pred_false = K.cast(y_pred_false,'float32')
-        y_true_true = tf.equal(y_true, 1)
-        y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
-        y_true_true = K.cast(y_true_true,'float32')
+        # for classification
+        y_pred_false = K.cast(tf.equal(K.argmax(y_pred, axis=-1),0), "float32")
+        y_pred_true = K.cast(tf.equal(K.argmax(y_pred, axis=-1),1), "float32")
+        y_true_false = K.cast(tf.equal(K.argmax(y_true, axis=-1),0), "float32")
+        y_true_true = K.cast(tf.equal(K.argmax(y_true, axis=-1),1), "float32")
+        # for regression
+        # y_pred_false = tf.math.less_equal(y_pred, 0)
+        # y_pred_true = K.cast(tf.logical_not(y_pred_false),'float32')
+        # y_pred_false = K.cast(y_pred_false,'float32')
+        # y_true_true = tf.equal(y_true, 1)
+        # y_true_false = K.cast(tf.logical_not(y_true_true),'float32')
+        # y_true_true = K.cast(y_true_true,'float32')
         
         true_positives = tf.reduce_sum(tf.math.multiply(y_true_true,y_pred_true))
         true_negatives = tf.reduce_sum(tf.math.multiply(y_true_false,y_pred_false))
