@@ -18,7 +18,7 @@ def weighted_masked_crossentropy(weight):
 
 def binary_cross_entropy(y_true, y_pred):
 
-    class_weights = tf.cast(tf.constant([[[1., 10.]]]),y_pred.dtype)
+    class_weights = tf.cast(tf.constant([[[10., 1.]]]),y_pred.dtype)
 
     y_pred = tf.convert_to_tensor(y_pred)
 

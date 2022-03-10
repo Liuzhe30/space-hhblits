@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class DataGenerator(tf.keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, x, y, batch_size=32, is_training = True, weight = 1, shuffle=True):
+    def __init__(self, x, y, batch_size=32, is_training = True, weight = 1, shuffle=False):
         'Initialization'
         self.x = x
         self.y = self._data_generation(y)
