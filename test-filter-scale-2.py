@@ -248,11 +248,11 @@ setup_experiment(config_vars, 'test')
 x = np.load('/home/panwh/space-hhblits/data/dataset_5A_simple_average_shhm_slidingwindow_x.npy')
 y = np.load('/home/panwh/space-hhblits/data/dataset_5A_simple_average_shhm_slidingwindow_y.npy')
 
-seed = np.random.randint(0, 10000)
-np.random.seed(seed)
-np.random.shuffle(x)
-np.random.seed(seed)
-np.random.shuffle(y)
+# seed = np.random.randint(0, 10000)
+# np.random.seed(seed)
+# np.random.shuffle(x)
+# np.random.seed(seed)
+# np.random.shuffle(y)
 # dataxy = np.random.shuffle(np.concatenate([x,np.reshape(y,(len(y),1))],axis=1))
 # x = dataxy[0:500000,:,0:20]
 # y = dataxy[0:500000]
@@ -292,23 +292,13 @@ callbacks=[checkpoint,callback_csv]
 #callbacks=[checkpoint,callback_csv,lr_decay]
 model_CNN_BiLSTM.fit_generator(
     generator=train_gen,
-    # steps_per_epoch=config_vars["steps_per_epoch"],
     epochs=config_vars["epochs"],
     validation_data=val_gen,
-    # validation_data = (x[900000:1007941,:,0:50],np.stack([y[900000:1007941],np.logical_not(y[900000:1007941])],axis=1)),
-    # validation_steps=int(len(data_partitions["validation"])/config_vars["val_batch_size"]),
     callbacks=callbacks,
     verbose = 1
 )
-# model_CNN.fit(
-#     x = train_set[:,:,0:50],
-#     y = train_set[:,:,51:None],
-#     batch_size = config_vars['batch_size'],
-#     validation_data = (valid_set[:,:,0:50],valid_set[:,:,51:None]),
-#     epochs = config_vars['epochs'],
-#     callbacks=callbacks,
-#     verbose = 1
-#     )
+
+
 model_CNN_BiLSTM.save_weights(config_vars["model_file"])
 pred = model_CNN_BiLSTM.predict(x[900000:1007941,:,0:50])
 print(pred)

@@ -13,7 +13,7 @@ print(len(name_list))
 import numpy as np
 import math
 max_range = 0
-output_path = 'data/shhm_data/0A_simple_average_shhm_exp/'
+output_path = 'data/shhm_data/0A_simple_average_shhm/'
 for uniprot_id in name_list:
     # fetch length
     with open(hhm_path + uniprot_id + '.hhm') as hhm_file:
@@ -43,8 +43,8 @@ for uniprot_id in name_list:
                         each_item[idx] = '99999'                            
                 for j in range(0, 20):
                     try:
-                        #hhm_matrix[idxx - 1, j] = int(each_item[j])
-                        hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j])/2000))                      
+                        hhm_matrix[idxx - 1, j] = int(each_item[j])
+                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j])/2000))                                              
                     except IndexError:
                         pass
             elif(len(hhm_line.split()) == 10):
@@ -54,8 +54,8 @@ for uniprot_id in name_list:
                         each_item[idx] = '99999'                             
                 for j in range(20, 30):
                     try:
-                        #hhm_matrix[idxx - 1, j] = int(each_item[j - 20]) 
-                        hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j - 20])/2000))                       
+                        hhm_matrix[idxx - 1, j] = int(each_item[j - 20]) 
+                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j - 20])/2000))                                               
                     except IndexError:
                         pass                            
             hhm_line = hhm_file.readline()
@@ -100,7 +100,7 @@ for uniprot_id in name_list:
                 space_hhm_matrix[residue_num][j] += hhm_matrix[num][j]
                 space_hhm_matrix[residue_num][j] /= float(len(residue_list)) # average
     print(space_hhm_matrix.shape)
-    print(space_hhm_matrix)
+    #print(space_hhm_matrix)
     
     with open(output_path + uniprot_id + '.shhm','w+') as out_file:
         np.savetxt(out_file, space_hhm_matrix, fmt='%.6f')

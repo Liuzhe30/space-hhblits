@@ -1,5 +1,9 @@
 # %%
 # fetch dataset name list
+from statistics import mode
+from utils.Transformer import MultiHeadSelfAttention
+from utils.Transformer import TransformerBlock
+from utils.Transformer import TokenAndPositionEmbedding
 import tensorflow as tf
 import utils.objectives
 import utils.metrics
@@ -86,141 +90,184 @@ print(len(name_list))
 
 # # %%
 # # set input layers
-input_feature = tf.keras.layers.Input(shape=[61, 50], name = 'input_feature')
-input_mask = tf.keras.layers.Input(shape=[61,], name = 'input_mask')
+input_feature = tf.keras.layers.Input(shape=[31, 50], name = 'input_feature')
+input_mask = tf.keras.layers.Input(shape=[31,], name = 'input_mask')
 
 # # %%
-# # 1 test MLP
+# # 1 test MLP-1
 # # build model
-hidden_1 = tf.keras.layers.Dense(512, activation='relu')(input_feature)
-hidden_2 = tf.keras.layers.Dense(256, activation='relu')(hidden_1)
+class ModelMLP():
+    def __init__(self) -> None:
+        pass
+
+    def create_model(self):
+        input_feature = tf.keras.layers.Input(shape=[31, 2575], name = 'input_feature')
+        # input_mask = tf.keras.layers.Input(shape=[31,], name = 'input_mask')
+        hidden_1 = tf.keras.layers.Dense(512, activation='relu')(input_feature)
+        hidden_2 = tf.keras.layers.Dense(256, activation='relu')(hidden_1)
+        drop1 = tf.keras.layers.Dropout(0.3)(hidden_2)
+        hidden_3 = tf.keras.layers.BatchNormalization()(drop1)
+        hidden_4 = tf.keras.layers.Dense(128, activation='relu')(hidden_3)
+        hidden_4 = tf.keras.layers.Flatten()(hidden_4)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_MLP')(hidden_4)
+        
+        model_MLP = tf.keras.models.Model(inputs=input_feature, outputs=output)
+        return model_MLP
+
+'''
+# # %%
+# # 1 test MLP-2
+# # build model
+#hidden_1 = tf.keras.layers.Dense(128, activation='relu')(input_feature)
+hidden_2 = tf.keras.layers.Dense(64, activation='relu')(input_feature)
 drop1 = tf.keras.layers.Dropout(0.3)(hidden_2)
 hidden_3 = tf.keras.layers.BatchNormalization()(drop1)
-hidden_4 = tf.keras.layers.Dense(128, activation='relu')(hidden_3)
+hidden_4 = tf.keras.layers.Dense(32, activation='relu')(hidden_3)
 hidden_4 = tf.keras.layers.Flatten()(hidden_4)
 output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_MLP')(hidden_4)
 model_MLP = tf.keras.models.Model(inputs=input_feature, outputs=output)
 model_MLP.summary()
+'''
+
+
 # # # %%
 # # # 2 test CNN
 # # # build model
-'''
-hidden_1 = tf.keras.layers.Conv1D(32, 5, kernel_initializer='he_uniform')(input_feature)
-hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
-hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
-hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
-hidden_2 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_1)
-hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
-hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
-hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
-hidden_3 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_2)
-hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
-hidden_3 = tf.keras.layers.Activation('relu')(hidden_3)
-hidden_3 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_3)
-hidden_3 = tf.keras.layers.Flatten()(hidden_3)
-output = tf.keras.layers.Dense(128, activation='relu')(hidden_3)
-output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_CNN')(output)
-model_CNN = tf.keras.models.Model(inputs=input_feature, outputs=output)
-model_CNN.summary()
-'''
+class ModelCNN():
+    def __init__(self) -> None:
+        hidden_1 = tf.keras.layers.Conv1D(32, 5, kernel_initializer='he_uniform')(input_feature)
+        hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
+        hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
+        hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
+        hidden_2 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_1)
+        hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
+        hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
+        hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
+        hidden_3 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_2)
+        hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
+        hidden_3 = tf.keras.layers.Activation('relu')(hidden_3)
+        hidden_3 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_3)
+        hidden_3 = tf.keras.layers.Flatten()(hidden_3)
+        output = tf.keras.layers.Dense(128, activation='relu')(hidden_3)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_CNN')(output)
+        model_CNN = tf.keras.models.Model(inputs=input_feature, outputs=output)
+        return model_CNN
+
 # # 3 test RNN
 # # build model
-# units = 32
-# rnn = tf.keras.layers.SimpleRNN(units,return_sequences=True)(input_feature)
-# rnn = tf.keras.layers.SimpleRNN(units,return_sequences=True)(rnn)
-# rnn = tf.keras.layers.BatchNormalization()(rnn)
-# rnn = tf.keras.layers.Flatten()(rnn)
-# #print('bet_cnn.get_shape()', rnn.get_shape())
-# rnn = tf.keras.layers.Dense(128, activation='relu')(rnn)
-# output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_RNN')(rnn)
-# model_RNN = tf.keras.models.Model(inputs=input_feature, outputs=output)
-# model_RNN.summary()
+class ModelRNN():
+    def __init__(self) -> None:
+        units = 32
+        rnn = tf.keras.layers.SimpleRNN(units,return_sequences=True)(input_feature)
+        rnn = tf.keras.layers.SimpleRNN(units,return_sequences=True)(rnn)
+        rnn = tf.keras.layers.BatchNormalization()(rnn)
+        rnn = tf.keras.layers.Flatten()(rnn)
+        #print('bet_cnn.get_shape()', rnn.get_shape())
+        rnn = tf.keras.layers.Dense(128, activation='relu')(rnn)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_RNN')(rnn)
+        model_RNN = tf.keras.models.Model(inputs=input_feature, outputs=output)
+        return model_RNN
+
 
 # # 4 test LSTM
 # # build model
-# units = 32
-# lstm = tf.keras.layers.LSTM(units, return_sequences=True)(input_feature)
-# lstm = tf.keras.layers.LSTM(units, return_sequences=True)(lstm)
-# lstm = tf.keras.layers.BatchNormalization()(lstm)
-# lstm = tf.keras.layers.Flatten()(lstm)
-# #print('lstm.get_shape()', lstm.get_shape())
-# lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
-# output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_LSTM')(lstm)
-# model_LSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
-# model_LSTM.summary()
+class ModelLSTM():
+    def __init__(self) -> None:
+        
+        units = 32
+        lstm = tf.keras.layers.LSTM(units, return_sequences=True)(input_feature)
+        lstm = tf.keras.layers.LSTM(units, return_sequences=True)(lstm)
+        lstm = tf.keras.layers.BatchNormalization()(lstm)
+        lstm = tf.keras.layers.Flatten()(lstm)
+        #print('lstm.get_shape()', lstm.get_shape())
+        lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_LSTM')(lstm)
+        model_LSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
+        return model_LSTM
+
+
 
 # # 5 test BiLSTM
-# units = 32
-# lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(input_feature)
-# lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(lstm)
-# lstm = tf.keras.layers.BatchNormalization()(lstm)
-# lstm = tf.keras.layers.Flatten()(lstm)
-# #print('lstm.get_shape()', lstm.get_shape())
-# lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
-# output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_BiLSTM')(lstm)
-# model_BiLSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
-# model_BiLSTM.summary()
-'''
+class ModelBILSTM():
+    def __init__(self) -> None:
+        
+        units = 32
+        lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(input_feature)
+        lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(lstm)
+        lstm = tf.keras.layers.BatchNormalization()(lstm)
+        lstm = tf.keras.layers.Flatten()(lstm)
+        #print('lstm.get_shape()', lstm.get_shape())
+        lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_BiLSTM')(lstm)
+        model_BiLSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
+        return model_BiLSTM
+
+
 # # 6 test CNN+BiLSTM
-units = 700
-hidden_1 = tf.keras.layers.Conv1D(32, 5, kernel_initializer='he_uniform')(input_feature)
-hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
-hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
-hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
-hidden_2 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_1)
-hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
-hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
-hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
-hidden_3 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_2)
-hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
-hidden_3 = tf.keras.layers.Activation('relu')(hidden_3)
-hidden_3 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_3)
-#print('hidden_3.get_shape()', hidden_3.get_shape())
-lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(hidden_3)
-lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(lstm)
-#lstm = tf.keras.layers.BatchNormalization()(lstm)
-lstm = tf.keras.layers.Flatten()(lstm)
-#print('lstm.get_shape()', lstm.get_shape())
-lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
-output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_CNN_BiLSTM')(lstm)
-model_CNN_BiLSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
-model_CNN_BiLSTM.summary()
-'''
+class ModelCNNBILSTM():
+    def __init__(self) -> None:
+        
+        units = 700
+        hidden_1 = tf.keras.layers.Conv1D(32, 5, kernel_initializer='he_uniform')(input_feature)
+        hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
+        hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
+        hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
+        hidden_2 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_1)
+        hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
+        hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
+        hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
+        hidden_3 = tf.keras.layers.Conv1D(32, 7, kernel_initializer='he_uniform')(hidden_2)
+        hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
+        hidden_3 = tf.keras.layers.Activation('relu')(hidden_3)
+        hidden_3 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_3)
+        #print('hidden_3.get_shape()', hidden_3.get_shape())
+        lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(hidden_3)
+        lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(lstm)
+        #lstm = tf.keras.layers.BatchNormalization()(lstm)
+        lstm = tf.keras.layers.Flatten()(lstm)
+        #print('lstm.get_shape()', lstm.get_shape())
+        lstm = tf.keras.layers.Dense(128, activation='relu')(lstm)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_CNN_BiLSTM')(lstm)
+        model_CNN_BiLSTM = tf.keras.models.Model(inputs=input_feature, outputs=output)
+
+
+
 # # 7 test Transformer
-# from utils.Transformer import MultiHeadSelfAttention
-# from utils.Transformer import TransformerBlock
-# from utils.Transformer import TokenAndPositionEmbedding
+class ModelTransformer():
+    def __init__(self) -> None:
+        maxlen = 1024
+        vocab_size = 5
+        embed_dim = 64
+        num_heads = 4
+        ff_dim = 64
+        pos_embed_dim = 64
+        seq_embed_dim = 13
+        num_heads = 4
 
-# def create_padding_mask(seq):
-#     seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
-#     # add extra dimensions to add the padding
-#     # to the attention logits.
-#     return  seq[:, tf.newaxis, tf.newaxis, :]# (batch_size, 1, 1, seq_len)
+        embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim, pos_embed_dim, seq_embed_dim)
+        trans_block_1 = TransformerBlock(embed_dim, num_heads, ff_dim)
+        trans_block_2 = TransformerBlock(embed_dim, num_heads, ff_dim)
 
-# maxlen = 1024
-# vocab_size = 5
-# embed_dim = 64
-# num_heads = 4
-# ff_dim = 64
-# pos_embed_dim = 64
-# seq_embed_dim = 13
-# num_heads = 4
+        mask = self._create_padding_mask(input_mask)
+        embedding = embedding_layer([input_mask, input_feature])
+        embedding = trans_block_1(embedding, mask)
+        embedding = trans_block_2(embedding, mask)
+        #print('embedding.get_shape()', embedding.get_shape())
 
-# embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim, pos_embed_dim, seq_embed_dim)
-# trans_block_1 = TransformerBlock(embed_dim, num_heads, ff_dim)
-# trans_block_2 = TransformerBlock(embed_dim, num_heads, ff_dim)
+        transformer = tf.keras.layers.Flatten()(embedding)
+        transformer = tf.keras.layers.Dense(128, activation='relu')(transformer)
+        output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_Transformer')(transformer)
+        model_Transformer = tf.keras.models.Model(inputs=[input_feature,input_mask], outputs=output)
+        return model_Transformer
 
-# mask = create_padding_mask(input_mask)
-# embedding = embedding_layer([input_mask, input_feature])
-# embedding = trans_block_1(embedding, mask)
-# embedding = trans_block_2(embedding, mask)
-# #print('embedding.get_shape()', embedding.get_shape())
 
-# transformer = tf.keras.layers.Flatten()(embedding)
-# transformer = tf.keras.layers.Dense(128, activation='relu')(transformer)
-# output = tf.keras.layers.Dense(2, activation='softmax', name = 'output_Transformer')(transformer)
-# model_Transformer = tf.keras.models.Model(inputs=[input_feature,input_mask], outputs=output)
-# model_Transformer.summary()
+    def _create_padding_mask(self, seq):
+        seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
+        # add extra dimensions to add the padding
+        # to the attention logits.
+        return  seq[:, tf.newaxis, tf.newaxis, :]# (batch_size, 1, 1, seq_len)
+
+
 
 
 
@@ -239,77 +286,103 @@ def setup_experiment(config_vars, experiment_name):
 
 config_vars = {}
 config_vars['epochs'] = 50
-config_vars['batch_size'] = 512
-config_vars['learning_rate'] = 7e-4
+config_vars['batch_size'] = 128
+config_vars['learning_rate'] = 5e-4
 config_vars['root_directory'] = '/home/panwh/space-hhblits/'
 config_vars['learning_rate_decay'] = 0.005
 
 setup_experiment(config_vars, 'test')
 
-x = np.load('/home/panwh/space-hhblits/data/dataset_5A_simple_average_shhm_slidingwindow_x.npy')
-y = np.load('/home/panwh/space-hhblits/data/dataset_5A_simple_average_shhm_slidingwindow_y.npy')
+class ModelFactory():
 
+    def __init__(self, model_name) -> None:
+        """generate npy data for generator
+
+        Args:
+            distance (int): 0 1 3 5 7 9 11
+            filter_strategy (str): 'simple_average'
+                                    'weighted_average'
+                                    'weighted_average_square'
+                                    'weighted_average_exponent'
+                                    'simple_average_frequency'
+        """
+        if model_name == 'ModelMLP':
+            self.model = ModelMLP().create_model()
+        training_x = np.load('/home/panwh/space-hhblits/data/dataset_max_length_distance_slidingwindow_training_x.npy')
+        training_y = np.load('/home/panwh/space-hhblits/data/dataset_max_length_distance_slidingwindow_training_y.npy')
+        val_x = np.load('/home/panwh/space-hhblits/data/dataset_max_length_distance_slidingwindow_validation_x.npy')
+        val_y = np.load('/home/panwh/space-hhblits/data/dataset_max_length_distance_slidingwindow_validation_y.npy')
+        self.train_gen = utils.data_provider.DataGenerator(x = training_x[:,:,0:2575],
+                                              y = training_y,
+                                              batch_size=config_vars['batch_size'],
+                                              is_training=True,
+                                              shuffle= True)
+        self.val_gen = utils.data_provider.DataGenerator(x = val_x[:,:,0:2575],
+                                            y = val_y,
+                                            batch_size=config_vars['batch_size'],
+                                            is_training = False,
+                                            shuffle = True)
+        self.optimizer = tf.keras.optimizers.Adam(lr = config_vars['learning_rate'])
+        self.lr_decay = tf.keras.callbacks.LearningRateScheduler(schedule=lambda epoch: config_vars['learning_rate'] * (config_vars['learning_rate_decay'] ** epoch))
+        # loss = utils.objectives.weighted_masked_crossentropy(weight=500)
+        self.loss = utils.objectives.binary_cross_entropy
+        self.metrics = [utils.metrics.sensitivities_metric(func_name = 'sensitivities'),
+                utils.metrics.specificities_metric(func_name = 'specificities'),
+                utils.metrics.precision_metric(func_name = 'precision'),
+                utils.metrics.accuracy_metric(func_name = 'accuracy'),
+                utils.metrics.f1_score_metric(func_name = 'f1_score'),
+                utils.metrics.mcc_metric(func_name = 'mcc')]
+        
+        self.model.compile(loss=self.loss, metrics = self.metrics, optimizer=self.optimizer)
+
+        self.checkpoint = tf.keras.callbacks.ModelCheckpoint(config_vars["experiment_dir"] + '/weights-{epoch:02d}.h5', monitor='mcc', mode='max', #val_categorical_accuracy val_acc
+                                            save_best_only=True, save_weights_only=True, verbose=1) 
+        # Performance logging
+        self.callback_csv = tf.keras.callbacks.CSVLogger(filename=config_vars["csv_log_file"])
+
+        self.callbacks=[self.checkpoint,self.callback_csv]
+        #callbacks=[checkpoint,callback_csv,lr_decay]
+        self.model.fit_generator(
+            generator=self.train_gen,
+            # steps_per_epoch=config_vars["steps_per_epoch"],
+            epochs=config_vars["epochs"],
+            validation_data=self.val_gen,
+            # validation_data = (x[900000:1007941,:,0:50],np.stack([y[900000:1007941],np.logical_not(y[900000:1007941])],axis=1)),
+            # validation_steps=int(len(data_partitions["validation"])/config_vars["val_batch_size"]),
+            callbacks=self.callbacks,
+            verbose = 1
+        )
+        self.model.save_weights(config_vars["model_file"])
+
+    def get_model(self):
+
+        return self.model
+                
+        # training_y = np.load('/home/panwh/space-hhblits/data/dataset_0A_simple_average_frequency_slidingwindow_training_y.npy')
+        # val_x = np.load('/home/panwh/space-hhblits/data/dataset_0A_simple_average_frequency_slidingwindow_validation_x.npy')
+        # val_y = np.load('/home/panwh/space-hhblits/data/dataset_0A_simple_average_frequency_slidingwindow_validation_y.npy')
+# x = np.load('/home/panwh/space-hhblits/data/dataset_3A_simple_average_shhm_slidingwindow_x.npy')
+# y = np.load('/home/panwh/space-hhblits/data/dataset_3A_simple_average_shhm_slidingwindow_y.npy')
+'''
 seed = np.random.randint(0, 10000)
 np.random.seed(seed)
 np.random.shuffle(x)
 np.random.seed(seed)
 np.random.shuffle(y)
+'''
 # dataxy = np.random.shuffle(np.concatenate([x,np.reshape(y,(len(y),1))],axis=1))
 # x = dataxy[0:500000,:,0:20]
 # y = dataxy[0:500000]
 
-train_gen = utils.data_provider.DataGenerator(x = x[0:500000,:,0:50],
-                                              y = y[0:500000],
-                                              batch_size=config_vars['batch_size'],
-                                              is_training=True,
-                                              shuffle= True)
-val_gen = utils.data_provider.DataGenerator(x = x[500000:700000,:,0:50],
-                                            y = y[500000:700000],
-                                            batch_size=config_vars['batch_size'],
-                                            is_training = False,
-                                            shuffle = True)
 
-del x
-del y
-optimizer = tf.keras.optimizers.Adam(lr = config_vars['learning_rate'])
-lr_decay = tf.keras.callbacks.LearningRateScheduler(schedule=lambda epoch: config_vars['learning_rate'] * (config_vars['learning_rate_decay'] ** epoch))
-# loss = utils.objectives.weighted_masked_crossentropy(weight=500)
-loss = utils.objectives.binary_cross_entropy
-metrics = [utils.metrics.sensitivities_metric(func_name = 'sensitivities'),
-           utils.metrics.specificities_metric(func_name = 'specificities'),
-           utils.metrics.precision_metric(func_name = 'precision'),
-           utils.metrics.accuracy_metric(func_name = 'accuracy'),
-           utils.metrics.f1_score_metric(func_name = 'f1_score'),
-           utils.metrics.mcc_metric(func_name = 'mcc')]
-model_MLP.compile(loss=loss, metrics = metrics, optimizer=optimizer)
+# del x
+# del y
 
-# model_CNN.compile(loss=loss, optimizer=optimizer)
-checkpoint = tf.keras.callbacks.ModelCheckpoint(config_vars["experiment_dir"] + '/weights-{epoch:02d}.h5', monitor='mcc', mode='max', #val_categorical_accuracy val_acc
-                                            save_best_only=True, save_weights_only=True, verbose=1) 
-# Performance logging
-callback_csv = tf.keras.callbacks.CSVLogger(filename=config_vars["csv_log_file"])
 
-callbacks=[checkpoint,callback_csv]
-#callbacks=[checkpoint,callback_csv,lr_decay]
-model_MLP.fit_generator(
-    generator=train_gen,
-    # steps_per_epoch=config_vars["steps_per_epoch"],
-    epochs=config_vars["epochs"],
-    validation_data=val_gen,
-    # validation_data = (x[900000:1007941,:,0:50],np.stack([y[900000:1007941],np.logical_not(y[900000:1007941])],axis=1)),
-    # validation_steps=int(len(data_partitions["validation"])/config_vars["val_batch_size"]),
-    callbacks=callbacks,
-    verbose = 1
-)
-# model_CNN.fit(
-#     x = train_set[:,:,0:50],
-#     y = train_set[:,:,51:None],
-#     batch_size = config_vars['batch_size'],
-#     validation_data = (valid_set[:,:,0:50],valid_set[:,:,51:None]),
-#     epochs = config_vars['epochs'],
-#     callbacks=callbacks,
-#     verbose = 1
-#     )
-model_MLP.save_weights(config_vars["model_file"])
-pred = model_MLP.predict(x[900000:1007941,:,0:50])
-print(pred)
+
+if __name__ == '__main__':
+    model = ModelFactory(5, 'simple_average_frequency', 'ModelMLP').get_model()
+
+    np.load('/home/panwh/space-hhblits/data/dataset_max_length_distance_slidingwindow_training_x.npy')
+    pred = model.predict(x[900000:1007941,:,0:50])
+# print(pred)
