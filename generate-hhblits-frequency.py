@@ -13,7 +13,8 @@ print(len(name_list))
 import numpy as np
 import math
 max_range = 0
-output_path = 'data/shhm_data/5A_simple_average_shhm/'
+output_path = 'data/shhm_data/0A_simple_average_shhm_frequency/'
+os.makedirs(output_path, exist_ok=True)
 for uniprot_id in name_list:
     # fetch length
     with open(hhm_path + uniprot_id + '.hhm') as hhm_file:
@@ -43,8 +44,9 @@ for uniprot_id in name_list:
                         each_item[idx] = '99999'                            
                 for j in range(0, 20):
                     try:
-                        hhm_matrix[idxx - 1, j] = int(each_item[j])
-                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j])/2000))                                              
+                        #hhm_matrix[idxx - 1, j] = int(each_item[j])
+                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j])/2000)) 
+                        hhm_matrix[idxx - 1, j] = math.pow(2, float(int(each_item[j]))/(-1000))
                     except IndexError:
                         pass
             elif(len(hhm_line.split()) == 10):
@@ -54,8 +56,9 @@ for uniprot_id in name_list:
                         each_item[idx] = '99999'                             
                 for j in range(20, 30):
                     try:
-                        hhm_matrix[idxx - 1, j] = int(each_item[j - 20]) 
-                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j - 20])/2000))                                               
+                        #hhm_matrix[idxx - 1, j] = int(each_item[j - 20]) 
+                        #hhm_matrix[idxx - 1, j] = 10/(1 + math.exp(-1 * int(each_item[j - 20])/2000))     
+                        hhm_matrix[idxx - 1, j] = math.pow(2, float(int(each_item[j - 20]))/(-1000))
                     except IndexError:
                         pass                            
             hhm_line = hhm_file.readline()
