@@ -291,23 +291,37 @@ class ModelCNNBILSTM():
         pass
 
     def create_model(self):
-        units = 700
+        units = 50
         input_feature_all = tf.keras.layers.Input(shape=[31, 52], name = 'input_feature')
         input_feature = input_feature_all[:,:,0:50]
+        onehot = input_feature[:,:,0:20]
+        hhblits = input_feature[:,:,20:50]
 
-        hidden_1 = tf.keras.layers.Conv1D(32, 3, kernel_initializer='he_uniform', padding='same')(input_feature)
+        hidden_1 = tf.keras.layers.Conv1D(16, 3, kernel_initializer='he_uniform', padding='same')(onehot)
         hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
         hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
         # hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
-        # hidden_2 = tf.keras.layers.Conv1D(32, 5, kernel_initializer='he_uniform', padding='same')(hidden_1)
-        # hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
-        # hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
+        hidden_2 = tf.keras.layers.Conv1D(32, 3, kernel_initializer='he_uniform', padding='same')(hidden_1)
+        hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
+        hidden_2_onehot = tf.keras.layers.Activation('relu')(hidden_1)
         # hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
-        # hidden_3 = tf.keras.layers.Conv1D(32, 3, kernel_initializer='he_uniform')(hidden_2)
-        # hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
-        # hidden_3 = tf.keras.layers.Activation('relu')(hidden_3)
+
+
+        hidden_1 = tf.keras.layers.Conv1D(128, 3, kernel_initializer='he_uniform', padding='same')(hhblits)
+        hidden_1 = tf.keras.layers.BatchNormalization()(hidden_1)
+        hidden_1 = tf.keras.layers.Activation('relu')(hidden_1)
+        # hidden_1 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_1)
+        hidden_2 = tf.keras.layers.Conv1D(128, 3, kernel_initializer='he_uniform', padding='same')(hidden_1)
+        hidden_2 = tf.keras.layers.BatchNormalization()(hidden_2)
+        hidden_2 = tf.keras.layers.Activation('relu')(hidden_2)
+        # hidden_2 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_2)
+        hidden_3 = tf.keras.layers.Conv1D(128, 3, kernel_initializer='he_uniform', padding = 'same')(hidden_2)
+        hidden_3 = tf.keras.layers.BatchNormalization()(hidden_3)
+        hidden_3_hhblits = tf.keras.layers.Activation('relu')(hidden_3)
         # hidden_3 = tf.keras.layers.MaxPooling1D(pool_size=2, strides=None)(hidden_3)
-        #print('hidden_3.get_shape()', hidden_3.get_shape())
+
+        merge = tf.keras.layers.concatenate([hidden_2_onehot,hidden_3_hhblits], axis=-1)
+
         lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(hidden_1)
         lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units, return_sequences=True))(lstm)
         #lstm = tf.keras.layers.BatchNormalization()(lstm)
@@ -318,7 +332,6 @@ class ModelCNNBILSTM():
         model_CNN_BiLSTM = tf.keras.models.Model(inputs=input_feature_all, outputs=output)
         model_CNN_BiLSTM.summary()
         return model_CNN_BiLSTM
-
 
 
 # # 7 test Transformer
