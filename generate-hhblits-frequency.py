@@ -101,7 +101,7 @@ for uniprot_id in name_list:
         for j in range(30):
             for num in residue_list:
                 space_hhm_matrix[residue_num][j] += hhm_matrix[num][j]
-                space_hhm_matrix[residue_num][j] /= float(len(residue_list)) # average
+            space_hhm_matrix[residue_num][j] /= float(len(residue_list)) # average
     print(space_hhm_matrix.shape)
     #print(space_hhm_matrix)
     
