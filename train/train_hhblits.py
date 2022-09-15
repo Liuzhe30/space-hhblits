@@ -74,7 +74,7 @@ class ModelMLPMultiInput():
         hidden_4 = tf.keras.layers.Concatenate(axis=-1)([hidden_input_feature_onehot2,
                                                          hidden_input_feature_hhblits2
                                                         #  hidden_input_feature_svd2
-                                                        #  hidden_input_feature_rasa
+                                                        #  hidden_input_feature_rasa2
                                                         # hidden_input_feature_ss2
                                                          ])
 
