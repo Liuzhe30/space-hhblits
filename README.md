@@ -14,5 +14,9 @@ We provide the dataset used in this study,  you can download [dataset_alphafold.
 ## Citation
 Please cite the following paper for using this code: 
 ```
+Liu, Z.; Pan, W.; Li, W.; Zhen, X.; Liang, J.; Cai, W.; Xu, F.; Yuan, K.; Lin, G.N. Evaluation of the Effectiveness of Derived Features of AlphaFold2 on Single-Sequence Protein Binding Site Prediction. Biology 2022, 11, 1454. https://doi.org/10.3390/biology11101454
+```
+or
+```
 Z. Liu et al., "Will AlphaFold2 Be Helpful in Improving the Accuracy of Single-sequence PPI Site Prediction?," 2022 10th International Conference on Bioinformatics and Computational Biology (ICBCB), 2022, pp. 18-23, doi: 10.1109/ICBCB55259.2022.9802490.
 ```
